@@ -1142,13 +1142,35 @@ function magpieSwitch() {
 }
 
 function supervise() {
+  // Magpie's Agents switch and connection.json are written at different
+  // moments. Latching the switch-off edge stops the two sources from fighting:
+  // without it, the tick restores Devin's settings and then re-applies them
+  // from a still-enabled connection.json three seconds later.
+  let switchPaused = false;
   const tick = () => {
     try {
       const cfg = current();
+      const sw = magpieSwitch();
+      if (sw) {
+        if (sw.wired) {
+          wasWired = true;
+          switchPaused = false;
+        } else if (wasWired === true && !switchPaused) {
+          wasWired = false;
+          switchPaused = true;
+          if (lastApplied) {
+            log('· magpie switch is off;', restoreDevinSettings(HOME));
+            lastApplied = null;
+          }
+        }
+      }
+
       // Supervised means the bridge was started by the Magpie plugin: only a
       // connection Magpie wrote as enabled may touch Devin. A standalone
       // bridge (node bridge.js / install.js) is on until told otherwise.
-      const enabled = supervised ? cfg.enabled === true : cfg.enabled !== false;
+      const enabled = switchPaused
+        ? false
+        : (supervised ? cfg.enabled === true : cfg.enabled !== false);
       if (enabled) {
         if (lastApplied !== running.address || enabledBefore === false) {
           if (applyDevinSettings(HOME, running.address)) {
@@ -1161,16 +1183,6 @@ function supervise() {
         lastApplied = null;
       }
       enabledBefore = enabled;
-
-      const sw = magpieSwitch();
-      if (sw) {
-        if (sw.wired) wasWired = true;
-        else if (wasWired === true && lastApplied) {
-          wasWired = false;
-          log('· magpie switch is off;', restoreDevinSettings(HOME));
-          lastApplied = null;
-        }
-      }
       writeStatus(enabled ? 'connected' : 'paused');
     } catch (err) {
       log('· supervisor:', err.message);
