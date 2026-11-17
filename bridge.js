@@ -96,7 +96,8 @@ function syncModelMap(uids) {
   // A map that already covers this user's own models is theirs; leave it alone.
   const covered = slots.length > 0 && slots.every(s => {
     const t = s && Array.isArray(s.targets) ? s.targets[0] : null;
-    return !!(t && t.model && models.includes(t.model));
+    // A map built by an older version may point at non-model UIDs; regenerate it.
+    return !!(t && t.model && models.includes(t.model) && isModelUid(s.modelUid));
   });
   if (covered) return;
   const provider = (readJSON(path.join(dir, 'providers.json')).providers || [])[0];
