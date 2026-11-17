@@ -1,6 +1,6 @@
 {
   "name": "magpie-agent-devin-bridge",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Devin · Magpie Bridge — 让 Devin 的 ACP agent 与桌面聊天使用 Magpie 的模型和路由组，模型菜单按供应商前缀分组",
   "license": "MIT",
