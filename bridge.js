@@ -128,10 +128,22 @@ function syncModelMap(uids) {
 
 // Remember the Devin model UIDs the server actually offers, then map this
 // user's Magpie models onto them. Cheap and idempotent: runs on heartbeats.
+// UIDs the server sends that are not pickable models (agent defaults, org
+// ids, streaming placeholders). Mapping a Magpie model onto them would waste
+// a menu slot.
+const NON_MODEL_UIDS = new Set(['subagent-default', 'LLAMA_WITH_SPECIAL', 'NVIDIA', 'swe-1-6']);
+
+function isModelUid(uid) {
+  if (!uid || NON_MODEL_UIDS.has(uid) || uid.startsWith('org-')) return false;
+  return /^[A-Za-z0-9][A-Za-z0-9._@:-]*$/.test(uid);
+}
+
 function saveDevinModels(body) {
   try {
     const list = extractModelList(body);
-    const uids = (Array.isArray(list) ? list : []).map(x => x && x.modelUid).filter(Boolean);
+    const uids = (Array.isArray(list) ? list : [])
+      .map(x => x && x.modelUid)
+      .filter(isModelUid);
     if (!uids.length) return;
     const prev = readJSON(DEVIN_MODELS_PATH);
     const same = Array.isArray(prev.uids) && prev.uids.length === uids.length
