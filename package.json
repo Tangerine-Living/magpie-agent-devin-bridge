@@ -1,0 +1,35 @@
+{
+  "name": "magpie-agent-devin-bridge",
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Devin · Magpie Bridge — 让 Devin 的 ACP agent 与桌面聊天使用 Magpie 的模型和路由组，模型菜单按供应商前缀分组",
+  "license": "MIT",
+  "files": [
+    "README.md",
+    "agent.js",
+    "bridge.js",
+    "config.example.json",
+    "devin-registry.js",
+    "devin-settings.js",
+    "ensure-bridge.js",
+    "icon.png",
+    "install.js",
+    "anybridge/",
+    "anybridge-config/"
+  ],
+  "keywords": [
+    "magpie",
+    "magpie-agent",
+    "devin",
+    "bridge"
+  ],
+  "magpie": {
+    "agent": "./agent.js",
+    "icon": "icon.png"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tangerine-Living/magpie-agent-devin-bridge.git"
+  },
+  "homepage": "https://github.com/Tangerine-Living/magpie-agent-devin-bridge"
+}

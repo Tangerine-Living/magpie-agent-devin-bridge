@@ -1,0 +1,15 @@
+{
+  "providers": [
+    {
+      "id": "magpie",
+      "name": "Magpie",
+      "apiHost": "http://127.0.0.1:3425",
+      "apiPath": "/v1",
+      "apiFormat": "openai",
+      "wireApi": "chat",
+      "apiKey": "magpie",
+      "defaultModel": "guanxingyun/deepseek-v4-1-flash",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,382 @@
+{
+  "labelTemplate": "{label}",
+  "slotVisibilityMode": "mapped",
+  "unlockScope": "all",
+  "slots": [
+    {
+      "modelUid": "kimi-k3-1-pro-max",
+      "displayName": "group/group",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "group/group"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-3-low",
+      "displayName": "ccx/loomy-spark-x2.6",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "ccx/loomy/spark-x2.6"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-3-high",
+      "displayName": "ccx/raccoon-sn-deepseek-v4-1-flash-1017",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "ccx/raccoon/sn-deepseek-v4-1-flash-1017"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-3-max",
+      "displayName": "guanxingyun/claude-opus-5",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/claude-opus-5"
+        }
+      ]
+    },
+    {
+      "modelUid": "swe-2-high",
+      "displayName": "guanxingyun/deepseek-v4-1-flash",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/deepseek-v4-1-flash"
+        }
+      ]
+    },
+    {
+      "modelUid": "swe-2-flash-medium",
+      "displayName": "guanxingyun/deepseek-v4-flash",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/deepseek-v4-flash"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-2",
+      "displayName": "guanxingyun/gemini-3.8-flash@133",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/gemini-3.8-flash@133"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-2-max",
+      "displayName": "guanxingyun/gemini-4-argon",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/gemini-4-argon"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-2-1m",
+      "displayName": "guanxingyun/glm-5.3-flash",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/glm-5.3-flash"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-2-max-1m",
+      "displayName": "guanxingyun/gpt-6-astra@119",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/gpt-6-astra@119"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-2-none",
+      "displayName": "guanxingyun/gpt-image-2.6-flare-c",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/gpt-image-2.6-flare-c"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-2-none-1m",
+      "displayName": "guanxingyun/MiniMax-H3",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "guanxingyun/MiniMax-H3"
+        }
+      ]
+    },
+    {
+      "modelUid": "nemotron-3-5-super-none",
+      "displayName": "codearts/glm-5.3-flash",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "codearts/glm-5.3-flash"
+        }
+      ]
+    },
+    {
+      "modelUid": "nemotron-3-5-super-medium",
+      "displayName": "codearts/deepseek-v4.1-flash",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "codearts/deepseek-v4.1-flash"
+        }
+      ]
+    },
+    {
+      "modelUid": "nemotron-3-5-super-high",
+      "displayName": "officeace/deepseek-v4.1-flash",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "officeace/deepseek-v4.1-flash"
+        }
+      ]
+    },
+    {
+      "modelUid": "kimi-k3-low",
+      "displayName": "officeace/glm-5.3-flash",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "officeace/glm-5.3-flash"
+        }
+      ]
+    },
+    {
+      "modelUid": "kimi-k3-high",
+      "displayName": "cline/cline-free-nemotron-3.5-super-vl",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/cline-free/nemotron-3.5-super-vl"
+        }
+      ]
+    },
+    {
+      "modelUid": "kimi-k3-max",
+      "displayName": "cline/cline-free-solar-mini4",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/cline-free/solar-mini4"
+        }
+      ]
+    },
+    {
+      "modelUid": "kimi-k3-1-pro-low",
+      "displayName": "cline/nvidia-nemotron-3.5-lightning-free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/nvidia/nemotron-3.5-lightning-free"
+        }
+      ]
+    },
+    {
+      "modelUid": "kimi-k3-1-pro-medium",
+      "displayName": "cline/inclusionai-ling-3.2-flash:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/inclusionai/ling-3.2-flash:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "kimi-k3-1-pro-high",
+      "displayName": "cline/baidu-ernie-5.5-flash-preview:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/baidu/ernie-5.5-flash-preview:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-3-flash-low",
+      "displayName": "cline/thinkingmachines-inkling-2-small:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/thinkingmachines/inkling-2-small:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-3-flash-high",
+      "displayName": "cline/liquid-lfm-3-1.7b:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/liquid/lfm-3-1.7b:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "glm-5-3-flash-max",
+      "displayName": "cline/particle-ai-particle-1:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/particle-ai/particle-1:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "deepseek-v4-flash-high",
+      "displayName": "cline/recursive-flint-v1.0:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/recursive/flint-v1.0:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "deepseek-v4-flash-max",
+      "displayName": "cline/nvidia-nemotron-3.5-super-vl:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/nvidia/nemotron-3.5-super-vl:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "deepseek-v4-1-flash-1017-none",
+      "displayName": "cline/dots-studio-dots-3-note-preview:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/dots-studio/dots-3-note-preview:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "deepseek-v4-1-flash-1017-low",
+      "displayName": "cline/nvidia-nemotron-3.5-lightning:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/nvidia/nemotron-3.5-lightning:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "deepseek-v4-1-flash-1017-high",
+      "displayName": "cline/cohere-north-mini-code:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/cohere/north-mini-code:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "deepseek-v4-1-flash-1017-max",
+      "displayName": "cline/nvidia-nemotron-3-ultra-550b-a55b:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/nvidia/nemotron-3-ultra-550b-a55b:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "swe-1-7",
+      "displayName": "cline/nvidia-nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "swe-1-7-medium",
+      "displayName": "cline/google-gemma-4-26b-a4b-it:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/google/gemma-4-26b-a4b-it:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "swe-2-medium",
+      "displayName": "cline/google-gemma-4-31b-it:free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/google/gemma-4-31b-it:free"
+        }
+      ]
+    },
+    {
+      "modelUid": "swe-2-max",
+      "displayName": "cline/openrouter-free",
+      "enabled": true,
+      "targets": [
+        {
+          "providerId": "magpie",
+          "model": "cline/openrouter/free"
+        }
+      ]
+    }
+  ],
+  "namePrefix": ""
+}
