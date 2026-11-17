@@ -53,8 +53,8 @@ function alive(host, port) {
 // ─── MITM certificates ────────────────────────────────────
 //
 // Same idea as AnyBridge's certs/: a local CA plus a leaf for the API hosts.
-// Devin trusts the CA through SSL_CERT_FILE (its CLI) and proxyStrictSSL=false
-// (the extension), so no certificate has to be installed system-wide.
+// devin-cli trusts the CA through SSL_CERT_FILE; the editor's Chromium trusts
+// it through proxyStrictSSL=false on Windows and the login Keychain on macOS.
 
 const CERTS = path.join(HOME, 'certs');
 const CA_PEM = path.join(CERTS, 'ca.pem');
@@ -81,11 +81,19 @@ function ensureCerts() {
     if (r.error) throw new Error('openssl is needed to make the proxy certificate: ' + r.error.message);
     if (r.status !== 0) throw new Error(`openssl ${args[0]} failed: ${(r.stderr || '').trim()}`);
   };
+  // A config file instead of -subj/-addext: macOS ships LibreSSL, whose older
+// versions reject -addext.
+  const caCnf = path.join(CERTS, 'ca.cnf');
+  fs.writeFileSync(caCnf, [
+    '[req]', 'distinguished_name=dn', 'x509_extensions=v3', 'prompt=no',
+    '[dn]', 'CN=Magpie Devin Local CA',
+    '[v3]', 'basicConstraints=critical,CA:TRUE',
+    'keyUsage=critical,keyCertSign,cRLSign',
+    '',
+  ].join(String.fromCharCode(10)));
   if (!fs.existsSync(ca)) {
     run(['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key, '-out', ca, '-days', '3650',
-      '-subj', '/CN=Magpie Devin Local CA',
-      '-addext', 'basicConstraints=critical,CA:TRUE',
-      '-addext', 'keyUsage=critical,keyCertSign,cRLSign']);
+      '-config', caCnf]);
   }
   const csr = path.join(CERTS, 'leaf.csr');
   run(['req', '-newkey', 'rsa:2048', '-nodes', '-keyout', leafKey, '-out', csr, '-config', cnf]);
@@ -95,78 +103,20 @@ function ensureCerts() {
   return true;
 }
 
-
-// ─── sessions.html script injection (AnyBridge's workbench_inject) ────────
-//
-// The new Devin UI renders its model menu from its own front-end state, so
-// changing the RPC responses is not enough. AnyBridge solves the same problem
-// by injecting a script into the IDE's own HTML; this is the same trick for
-// Devin's sessions window: a same-origin script (CSP allows 'self') that
-// renames the model entries it can see to Magpie's models. Selection still
-// sends Devin's own uid, and the bridge maps it to Magpie's chosen model.
-
-const SCRIPT_NAME = 'magpie-models.js';
-const MARK = '<!-- magpie-models -->';
-
-function appRoot() {
-  const cli = devinCli();
-  const norm = cli.split(String.fromCharCode(92)).join('/');
-  const i = norm.indexOf('/resources/app/');
-  return i >= 0 ? norm.slice(0, i + '/resources/app'.length) : '';
+// macOS validates the GUI's TLS against the Keychain, not against
+// proxyStrictSSL. Add the local CA once (the dialog asks for the login
+// password); the devin-cli side only needs SSL_CERT_FILE.
+function trustCa() {
+  if (process.platform !== 'darwin') return '';
+  const keychain = path.join(os.homedir(), 'Library', 'Keychains', 'login.keychain-db');
+  const r = spawnSync('security', ['add-trusted-cert', '-r', 'trustRoot', '-k', keychain, CA_PEM], {
+    encoding: 'utf8',
+    timeout: 20000,
+  });
+  if (r.status === 0) return 'CA trusted in the login keychain';
+  return `trust the CA once: security add-trusted-cert -r trustRoot -k "${keychain}" "${CA_PEM}"`;
 }
 
-function sessionsHtml() {
-  const root = appRoot();
-  return root ? path.join(root.replace(/\//g, String.fromCharCode(92)), 'out', 'vs', 'sessions', 'electron-browser', 'sessions.html') : '';
-}
-
-function modelNames() {
-  let c = config();
-  try {
-    const conn = JSON.parse(fs.readFileSync(path.join(HOME, 'connection.json'), 'utf8'));
-    if (Array.isArray(conn.models) && conn.models.length) c = { ...c, exposedModels: conn.models.map(m => (typeof m === 'string' ? m : m.id)) };
-  } catch {}
-  const list = Array.isArray(c.exposedModels) && c.exposedModels.length ? c.exposedModels : [c.model].filter(Boolean);
-  return list.map(m => (typeof m === 'string' ? m : m && m.id)).filter(Boolean);
-}
-
-function injectSessions(enable) {
-  const file = sessionsHtml();
-  if (!file || !fs.existsSync(file)) return 'sessions.html not found';
-  const backup = file + '.magpie-origin';
-  const scriptFile = path.join(path.dirname(file), SCRIPT_NAME);
-  if (!enable) {
-    if (fs.existsSync(backup)) fs.writeFileSync(file, fs.readFileSync(backup), 'utf8');
-    try { fs.unlinkSync(backup); } catch {}
-    try { fs.unlinkSync(scriptFile); } catch {}
-    return 'sessions.html restored';
-  }
-  if (!fs.existsSync(backup)) fs.copyFileSync(file, backup);
-  const names = modelNames();
-  const js = `(function(){
-const NAMES=${JSON.stringify(names)};
-const RE=/^(SWE-|Kimi|GLM-|DeepSeek|Nemotron|Fusion|Adaptive|Fable|MAE?-|Claude|GPT-)/i;
-let i=0;
-function walk(root){
-  if(!root) return;
-  const it=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,null);
-  while(it.nextNode()){
-    const n=it.currentNode;
-    if(n.nodeType===1){ if(n.shadowRoot) walk(n.shadowRoot); continue; }
-    const t=(n.nodeValue||'').trim();
-    if(t&&t.length<40&&RE.test(t)&&!n.parentElement?.dataset.magpie){ n.nodeValue=NAMES[i++%NAMES.length]; n.parentElement.dataset.magpie='1'; }
-  }
-}
-setInterval(()=>{ try{ walk(document); }catch(e){} }, 800);
-})();`;
-  fs.writeFileSync(scriptFile, js, 'utf8');
-  let html = fs.readFileSync(file, 'utf8');
-  if (!html.includes(MARK)) {
-    html = html.replace('</head>', `${MARK}<script src="./${SCRIPT_NAME}"></script></head>`);
-    fs.writeFileSync(file, html, 'utf8');
-  }
-  return `sessions.html patched (${names.length} names)`;
-}
 
 // ─── Devin SessionStart hook ──────────────────────────────
 //
@@ -174,7 +124,9 @@ setInterval(()=>{ try{ walk(document); }catch(e){} }, 800);
 // session and is what brings the bridge up when Devin starts, so nothing has
 // to run at login.
 
-const HOOK_COMMAND = `node "${path.join(path.dirname(fileURLToPath(import.meta.url)), 'ensure-bridge.js')}"`;
+// Use this Node binary, not "node": Devin on macOS starts the hook from the
+// GUI, whose PATH often has no Node installed at all.
+const HOOK_COMMAND = `"${process.execPath}" "${path.join(path.dirname(fileURLToPath(import.meta.url)), 'ensure-bridge.js')}"`;
 
 function hookState() {
   try {
@@ -264,6 +216,8 @@ async function waitAlive(host, port, ms = 4000) {
 
 async function install() {
   ensureCerts();
+  const trust = trustCa();
+  if (trust) console.log(trust);
   const mitmPort = Number(config().mitmPort || 7450);
   const url = baseUrl();
   const [host, port] = listenTarget().split(':');
