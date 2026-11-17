@@ -83,6 +83,19 @@ export function entry(url) {
       NO_PROXY: '127.0.0.1,localhost,::1',
     },
   });
+  // Entries carry the binary path of the machine writing them, so only the
+// running platform's architectures are listed: an entry for another OS would
+// point at a path that does not exist there.
+  const binary = {};
+  if (process.platform === 'darwin') {
+    binary['darwin-x86_64'] = target();
+    binary['darwin-aarch64'] = target();
+  } else if (process.platform === 'win32') {
+    binary['windows-x86_64'] = target();
+    binary['windows-aarch64'] = target();
+  } else {
+    binary['linux-x86_64'] = target();
+  }
   return {
     id: AGENT_ID,
     name: 'Devin via Magpie',
@@ -90,14 +103,7 @@ export function entry(url) {
     description: 'Devin CLI through the local Magpie bridge (Magpie models and routing groups)',
     authors: ['magpie-devin-bridge'],
     license: 'MIT',
-    distribution: {
-      binary: {
-        'windows-x86_64': target(),
-        'windows-aarch64': target(),
-        'darwin-x86_64': target(),
-        'darwin-aarch64': target(),
-      },
-    },
+    distribution: { binary },
   };
 }
 
