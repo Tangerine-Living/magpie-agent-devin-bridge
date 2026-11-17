@@ -1169,8 +1169,12 @@ function supervise() {
       // the settings back once instead of leaving them applied.
       if (!startupChecked) {
         startupChecked = true;
-        if (sw && !sw.wired && cfg.enabled !== true
-          && devinState(running.address) === 'pointed at the bridge') {
+        // Magpie manages this agent when it knows about it or when the
+        // connection was enabled. If that management is not currently on and
+        // Devin still points here (a restart after disconnect), put it back.
+        const managed = !!(sw || cfg.enabled === true);
+        const live = !!(sw && sw.wired && cfg.enabled === true);
+        if (managed && !live && devinState(running.address) === 'pointed at the bridge') {
           log('·', restoreDevinSettings(HOME));
         }
       }
