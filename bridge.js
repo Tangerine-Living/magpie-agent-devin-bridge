@@ -1182,7 +1182,13 @@ function supervise() {
       const enabled = switchPaused ? false : cfg.enabled === true;
       if (enabled) {
         if (lastApplied !== running.address || enabledBefore === false) {
-          if (applyDevinSettings(HOME, running.address)) {
+          // Point the ACP agent here AND the editor's own traffic at the MITM,
+          // otherwise the model menu loses its proxy after a reconnect.
+          const mitmPort = Number(current().mitmPort || process.env.MAGPIE_DEVIN_MITM_PORT || 7450);
+          const ca = path.join(HOME, 'certs', 'ca.pem');
+          const opts = { proxy: `http://127.0.0.1:${mitmPort}` };
+          if (fs.existsSync(ca)) opts.ca = ca;
+          if (applyDevinSettings(HOME, running.address, opts)) {
             log(`· Devin settings now point at ${running.address}`);
           }
           lastApplied = running.address;
