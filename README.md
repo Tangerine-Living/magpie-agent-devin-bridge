@@ -2,7 +2,7 @@
 
 让 **Devin 桌面版**的本地会话直接使用 Magpie 中配置的模型与路由组。模型菜单按供应商前缀分组，选中即用；不需要登录 Devin，也不消耗 Devin 额度。
 
-当前支持 **Windows (x64)**。Cloud 会话不受影响，仍走 Cognition 云端。
+当前支持 **Windows (x64)** 与 **macOS (Apple Silicon / Intel)**。Cloud 会话不受影响，仍走 Cognition 云端。
 
 ---
 
@@ -29,18 +29,26 @@ github:Tangerine-Living/magpie-agent-devin-bridge
 
 ### 前置条件
 
-- 已安装 **Devin** 与 **Magpie**。
+- 已安装 **Devin**、**Magpie** 与 **Node.js 18+**（安装器与会话钩子使用）。
 - Magpie 中已配置至少一个可用模型或路由组。
 
 ### 步骤
 
 1. **运行一次安装器**（生成证书、写入 Devin 配置、挂上 SessionStart 钩子）：
 
+   Windows (PowerShell)：
    ```powershell
    node "$env:USERPROFILE\.config\magpie\plugins\node_modules\magpie-agent-devin-bridge\install.js" install
    ```
 
-   首次运行会安装本机 CA（Windows 证书确认窗口点「是」）。
+   macOS (Terminal)：
+   ```bash
+   node "$HOME/.config/magpie/plugins/node_modules/magpie-agent-devin-bridge/install.js" install
+   ```
+
+   - **Windows**：首次运行会安装本机 CA（证书确认窗口点「是」）。
+   - **macOS**：首次运行会把本机 CA 加入登录钥匙串，系统会弹窗要求授权；若没有弹窗，按终端提示执行一次
+     `security add-trusted-cert -r trustRoot -k ~/Library/Keychains/login.keychain-db "<CA 路径>"`。
 
 2. **在 Magpie 中选择模型**：
    打开 Magpie → **Agents** → **Devin · Magpie Bridge**，打开「接入」并选择模型或路由组。
@@ -80,7 +88,8 @@ Devin 桌面版
 
 - **8788**：本地 agent 只认 `WINDSURF_API_SERVER_URL`，桥接在这里实现它的 Connect-RPC 接口，并把对话转成 Magpie 的 OpenAI 请求。
 - **7450**：界面自己的聊天/模型目录直连 `server.codeium.com`，只能通过 `http.proxy` 拦下来；桥接在这里只改写模型目录，其它流量原样转发。Cloud 会话只是路过这一跳，不被改写。
-- **配置目录**：`%USERPROFILE%\.config\magpie-devin-bridge\`（`config.json`、`connection.json`、`certs/`、`bridge.log`）。
+- **配置目录**：Windows `%USERPROFILE%\.config\magpie-devin-bridge\`，macOS `~/.config/magpie-devin-bridge/`
+  （`config.json`、`connection.json`、`certs/`、`bridge.log`）。
 - **桥接生命周期**：Devin 每次开始会话时由 SessionStart 钩子按需拉起；Devin 退出后自动结束，没有常驻服务。
 
 ---
@@ -93,6 +102,8 @@ Devin 桌面版
 | Devin 连不上 / 一直重试 | 看 `bridge.log`；执行 `install.js status`，确认 8788 没被占用。 |
 | 打开「接入」后没反应 | 确认安装器已运行（钩子存在）、Devin 已重启。 |
 | 断开后配置没还原 | 关闭开关后等约 5 秒；仍不还原时执行 `install.js uninstall`。 |
+| macOS：菜单空白 / 证书报错 | 本机 CA 没被信任：重新运行安装器，或执行 README 里的 `security add-trusted-cert`。 |
+| macOS：钩子没启动桥接 | 确认安装时用的是 Node 18+；钩子记录的是安装时的 node 绝对路径。 |
 
 ---
 
