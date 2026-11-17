@@ -26,7 +26,8 @@ export function registryPaths() {
     ];
   }
   if (process.platform === 'darwin') {
-    return [path.join(os.homedir(), 'Library', 'Application Support', 'devin', 'acp', 'registry.json')];
+    const base = path.join(os.homedir(), 'Library', 'Application Support');
+    return ['Devin', 'devin'].map(name => path.join(base, name, 'acp', 'registry.json'));
   }
   return [path.join(os.homedir(), '.config', 'devin', 'acp', 'registry.json')];
 }
@@ -55,11 +56,33 @@ function write(json) {
 
 export function devinCli() {
   if (process.env.DEVIN_CLI) return process.env.DEVIN_CLI;
-  const known = 'D:\\DevSpace\\Tools\\Devin\\resources\\app\\extensions\\windsurf\\devin\\bin\\devin.exe';
-  return fs.existsSync(known) ? known : 'devin.exe';
+  const candidates = [];
+  if (process.platform === 'win32') {
+    candidates.push(
+      'D:\\DevSpace\\Tools\\Devin\\resources\\app\\extensions\\windsurf\\devin\\bin\\devin.exe',
+    );
+  } else if (process.platform === 'darwin') {
+    const relative = 'Contents/Resources/app/extensions/windsurf/devin/bin/devin';
+    candidates.push(
+      path.join('/Applications', 'Devin.app', relative),
+      path.join(os.homedir(), 'Applications', 'Devin.app', relative),
+    );
+  }
+  const known = candidates.find(file => fs.existsSync(file));
+  return known || (process.platform === 'win32' ? 'devin.exe' : 'devin');
 }
 
 export function entry(url) {
+  const target = () => ({
+    archive: '',
+    cmd: devinCli(),
+    args: ['acp'],
+    env: {
+      WINDSURF_API_SERVER_URL: url,
+      WINDSURF_API_KEY: 'magpie-bridge',
+      NO_PROXY: '127.0.0.1,localhost,::1',
+    },
+  });
   return {
     id: AGENT_ID,
     name: 'Devin via Magpie',
@@ -69,26 +92,10 @@ export function entry(url) {
     license: 'MIT',
     distribution: {
       binary: {
-        'windows-x86_64': {
-          archive: '',
-          cmd: devinCli(),
-          args: ['acp'],
-          env: {
-            WINDSURF_API_SERVER_URL: url,
-            WINDSURF_API_KEY: 'magpie-bridge',
-            NO_PROXY: '127.0.0.1,localhost,::1',
-          },
-        },
-        'windows-aarch64': {
-          archive: '',
-          cmd: devinCli(),
-          args: ['acp'],
-          env: {
-            WINDSURF_API_SERVER_URL: url,
-            WINDSURF_API_KEY: 'magpie-bridge',
-            NO_PROXY: '127.0.0.1,localhost,::1',
-          },
-        },
+        'windows-x86_64': target(),
+        'windows-aarch64': target(),
+        'darwin-x86_64': target(),
+        'darwin-aarch64': target(),
       },
     },
   };
