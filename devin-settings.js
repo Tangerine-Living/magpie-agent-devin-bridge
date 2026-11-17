@@ -7,14 +7,21 @@ import path from 'node:path';
 
 export function settingsPath() {
   if (process.env.DEVIN_SETTINGS) return process.env.DEVIN_SETTINGS;
+  const roots = [];
   if (process.platform === 'win32') {
-    const appdata = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
-    return path.join(appdata, 'devin', 'User', 'settings.json');
+    roots.push(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'));
+  } else if (process.platform === 'darwin') {
+    roots.push(path.join(os.homedir(), 'Library', 'Application Support'));
+  } else {
+    roots.push(path.join(os.homedir(), '.config'));
   }
-  if (process.platform === 'darwin') {
-    return path.join(os.homedir(), 'Library', 'Application Support', 'devin', 'User', 'settings.json');
-  }
-  return path.join(os.homedir(), '.config', 'devin', 'User', 'settings.json');
+  // The desktop app's product name is "Devin"; older builds used lowercase.
+  // Windows is case-insensitive, macOS and Linux are not, so pick whichever
+  // directory actually exists.
+  const candidates = roots
+    .flatMap(root => ['Devin', 'devin'].map(name => path.join(root, name, 'User', 'settings.json')))
+    .filter((file, i, all) => all.indexOf(file) === i);
+  return candidates.find(file => fs.existsSync(file)) || candidates[0];
 }
 
 export function configPath() {
