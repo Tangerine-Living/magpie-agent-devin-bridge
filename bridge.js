@@ -1099,7 +1099,6 @@ const STATUS_PATH = path.join(HOME, 'status.json');
 const IS_MAIN = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 let running = null;
-let supervised = false;
 let lastApplied = null;
 let enabledBefore = null;
 let wasWired = null;
@@ -1148,6 +1147,7 @@ function supervise() {
   // without it, the tick restores Devin's settings and then re-applies them
   // from a still-enabled connection.json three seconds later.
   let switchPaused = false;
+  let startupChecked = false;
   const tick = () => {
     try {
       const cfg = current();
@@ -1156,22 +1156,26 @@ function supervise() {
         if (sw.wired) {
           wasWired = true;
           switchPaused = false;
-        } else if (wasWired === true && !switchPaused) {
+        } else if (wasWired === true && !switchPaused && lastApplied) {
           wasWired = false;
           switchPaused = true;
-          if (lastApplied) {
-            log('· magpie switch is off;', restoreDevinSettings(HOME));
-            lastApplied = null;
-          }
+          log('· magpie switch is off;', restoreDevinSettings(HOME));
+          lastApplied = null;
         }
       }
 
-      // Supervised means the bridge was started by the Magpie plugin: only a
-      // connection Magpie wrote as enabled may touch Devin. A standalone
-      // bridge (node bridge.js / install.js) is on until told otherwise.
-      const enabled = switchPaused
-        ? false
-        : (supervised ? cfg.enabled === true : cfg.enabled !== false);
+      // Only a connection Magpie wrote as enabled may touch Devin: after a
+      // disconnect it rewrites connection.json as {}, and a restart must put
+      // the settings back once instead of leaving them applied.
+      if (!startupChecked) {
+        startupChecked = true;
+        if (sw && !sw.wired && cfg.enabled !== true
+          && devinState(running.address) === 'pointed at the bridge') {
+          log('·', restoreDevinSettings(HOME));
+        }
+      }
+
+      const enabled = switchPaused ? false : cfg.enabled === true;
       if (enabled) {
         if (lastApplied !== running.address || enabledBefore === false) {
           if (applyDevinSettings(HOME, running.address)) {
@@ -1195,7 +1199,6 @@ function supervise() {
 
 export function startBridge(overrides = {}) {
   if (running) return running;
-  supervised = overrides.supervised === true;
   const cfg = { ...current(), ...overrides };
   const listen = String(overrides.listen || cfg.listen || process.env.MAGPIE_DEVIN_LISTEN || '127.0.0.1:8788');
   const [host, port] = listen.split(':');
