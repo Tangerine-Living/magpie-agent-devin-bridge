@@ -2,7 +2,8 @@
 
 让 **Devin 桌面版**的本地会话直接使用 Magpie 中配置的模型与路由组。模型菜单按供应商前缀分组，选中即用；不需要登录 Devin，也不消耗 Devin 额度。
 
-当前支持 **Windows (x64)** 与 **macOS (Apple Silicon / Intel)**。Cloud 会话不受影响，仍走 Cognition 云端。
+**Windows (x64)** 上已实机验证可用；**macOS (Apple Silicon / Intel)** 已提供实现，但尚未实机验证（实验性）。
+Cloud 会话不受影响，仍走 Cognition 云端。
 
 ---
 
@@ -41,7 +42,7 @@ github:Tangerine-Living/magpie-agent-devin-bridge
    node "$env:USERPROFILE\.config\magpie\plugins\node_modules\magpie-agent-devin-bridge\install.js" install
    ```
 
-   macOS (Terminal)：
+   macOS (Terminal) —— **实验性，尚未实机验证**：
    ```bash
    node "$HOME/.config/magpie/plugins/node_modules/magpie-agent-devin-bridge/install.js" install
    ```
@@ -49,6 +50,7 @@ github:Tangerine-Living/magpie-agent-devin-bridge
    - **Windows**：首次运行会安装本机 CA（证书确认窗口点「是」）。
    - **macOS**：首次运行会把本机 CA 加入登录钥匙串，系统会弹窗要求授权；若没有弹窗，按终端提示执行一次
      `security add-trusted-cert -r trustRoot -k ~/Library/Keychains/login.keychain-db "<CA 路径>"`。
+     该平台尚未实机验证；遇到问题请附 `install.js status` 与 `~/.config/magpie-devin-bridge/bridge.log` 反馈。
 
 2. **在 Magpie 中选择模型**：
    打开 Magpie → **Agents** → **Devin · Magpie Bridge**，打开「接入」并选择模型或路由组。
@@ -102,8 +104,8 @@ Devin 桌面版
 | Devin 连不上 / 一直重试 | 看 `bridge.log`；执行 `install.js status`，确认 8788 没被占用。 |
 | 打开「接入」后没反应 | 确认安装器已运行（钩子存在）、Devin 已重启。 |
 | 断开后配置没还原 | 关闭开关后等约 5 秒；仍不还原时执行 `install.js uninstall`。 |
-| macOS：菜单空白 / 证书报错 | 本机 CA 没被信任：重新运行安装器，或执行 README 里的 `security add-trusted-cert`。 |
-| macOS：钩子没启动桥接 | 确认安装时用的是 Node 18+；钩子记录的是安装时的 node 绝对路径。 |
+| macOS（实验性）：菜单空白 / 证书报错 | 本机 CA 没被信任：重新运行安装器，或执行 README 里的 `security add-trusted-cert`。 |
+| macOS（实验性）：钩子没启动桥接 | 确认安装时用的是 Node 18+；钩子记录的是安装时的 node 绝对路径；Devin.app 路径不同时用 `DEVIN_CLI` 指定。 |
 
 ---
 
