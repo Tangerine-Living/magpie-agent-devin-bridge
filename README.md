@@ -66,7 +66,8 @@ Devin 桌面版
 
 3. 在 Magpie → **Agents** 里找到 **Devin · Magpie Bridge**，选择模型或路由组
    （例如 `group/group`）。Magpie 会把选择写进
-   `%USERPROFILE%\.config\magpie-devin-bridge\connection.json`。
+   `%USERPROFILE%\.config\magpie-devin-bridge\connection.json`。命令行也可以：
+   `magpie "Devin · Magpie Bridge" <模型 id>`。
 
 4. 完全退出 Devin 再打开（或新开一个会话）。
 
