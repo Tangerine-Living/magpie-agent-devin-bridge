@@ -15,7 +15,8 @@
     "icon.png",
     "install.js",
     "anybridge/",
-    "anybridge-config/"
+    "anybridge-config/",
+    "LICENSE"
   ],
   "keywords": [
     "magpie",
